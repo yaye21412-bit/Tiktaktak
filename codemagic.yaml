@@ -5,13 +5,17 @@ workflows:
     environment:
       flutter: stable
     scripts:
-      - name: Crear proyecto Android
+      - name: Generar carpetas y estructura de Android
         script: flutter create . --platforms=android
-      - name: Limpiar proyecto
-        script: flutter clean
+      - name: Configurar permisos de red automáticamente
+        script: |
+          MANIFEST="android/app/src/main/AndroidManifest.xml"
+          if [ -f "$MANIFEST" ]; then
+            sed -i 's/<application/<uses-permission android:name="android.permission.INTERNET"\/>\n    <application/' "$MANIFEST"
+          fi
       - name: Instalar dependencias
         script: flutter pub get
-      - name: Construir APK
-        script: flutter build apk --release --build-name=1.0.0 --build-number=1
+      - name: Construir APK de Android
+        script: flutter build apk --release
     artifacts:
-      - build/app/outputs/flutter-apk/app-release.apk-release.apk
+      - build/app/outputs/flutter-apk/*.apk
