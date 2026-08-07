@@ -5,6 +5,8 @@ workflows:
     environment:
       flutter: stable
     scripts:
+      - name: Limpiar proyecto
+        script: flutter clean
       - name: Instalar dependencias de Flutter
         script: flutter packages get
       - name: Construir APK de Android
