@@ -1,0 +1,17 @@
+name: titaktak
+description: Una app de videos cortos estilo TikTok.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  video_player: ^2.8.0
+  cloud_firestore: ^4.15.0
+  firebase_core: ^2.24.2
+
+flutter:
+  uses-material-design: true
