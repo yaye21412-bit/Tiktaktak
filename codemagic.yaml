@@ -5,13 +5,13 @@ workflows:
     environment:
       flutter: stable
     scripts:
-      - name: Crear soporte para Android
+      - name: Crear proyecto Android
         script: flutter create . --platforms=android
       - name: Limpiar proyecto
         script: flutter clean
-      - name: Instalar dependencias de Flutter
-        script: flutter packages get
-      - name: Construir APK de Android
-        script: flutter build apk --release
+      - name: Instalar dependencias
+        script: flutter pub get
+      - name: Construir APK
+        script: flutter build apk --release --build-name=1.0.0 --build-number=1
     artifacts:
-      - build/app/outputs/flutter-apk/app-release.apk
+      - build/app/outputs/flutter-apk/app-release.apk-release.apk
