@@ -1,5 +1,5 @@
 name: titaktak
-description: Una app de videos cortos estilo TikTok con pasarela de pagos.
+description: Una app de videos cortos estilo TikTok.
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -12,7 +12,6 @@ dependencies:
   video_player: ^2.8.0
   cloud_firestore: ^4.15.0
   firebase_core: ^2.24.2
-  in_app_purchase: ^3.1.13
 
 flutter:
   uses-material-design: true
