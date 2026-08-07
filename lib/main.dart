@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:in_app_purchase/in_app_purchase.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -10,114 +9,29 @@ void main() async {
   runApp(MaterialApp(debugShowCheckedModeBanner: false, title: 'Titaktak', home: VideoFeedScreen()));
 }
 
-class VideoFeedScreen extends StatefulWidget {
-  @override
-  _VideoFeedScreenState createState() => _VideoFeedScreenState();
-}
-
-class _VideoFeedScreenState extends State<VideoFeedScreen> {
-  final InAppPurchase _inAppPurchase = InAppPurchase.instance;
-  bool _isAvailable = false;
-  List<ProductDetails> _products = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _initializeStore();
-  }
-
-  void _initializeStore() async {
-    _isAvailable = await _inAppPurchase.isAvailable();
-    if (_isAvailable) {
-      const Set<String> _kIds = {'titaktak_coins_100', 'titaktak_coins_500'};
-      ProductDetailsResponse response = await _inAppPurchase.queryProductDetails(_kIds);
-      setState(() {
-        _products = response.productDetails;
-      });
-    }
-  }
-
-  void _comprarMonedas(ProductDetails product) {
-    final PurchaseParam purchaseParam = PurchaseParam(productDetails: product);
-    _inAppPurchase.buyConsumable(purchaseParam: purchaseParam);
-  }
-
-  void _abrirRecargas() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.grey[900],
-      builder: (context) => Container(
-        padding: EdgeInsets.all(20),
-        height: 350,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("Recargar Monedas", style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
-            SizedBox(height: 10),
-            _isAvailable && _products.isNotEmpty
-                ? Expanded(
-                    child: ListView.builder(
-                      itemCount: _products.length,
-                      itemBuilder: (context, index) {
-                        final product = _products[index];
-                        return Card(
-                          color: Colors.grey[800],
-                          child: ListTile(
-                            title: Text(product.title, style: TextStyle(color: Colors.white)),
-                            subtitle: Text(product.description, style: TextStyle(color: Colors.grey[400])),
-                            trailing: ElevatedButton(
-                              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                              onPressed: () => _comprarMonedas(product),
-                              child: Text(product.price),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  )
-                : Center(child: Text("Cargando tienda...", style: TextStyle(color: Colors.white))),
-          ],
-        ),
-      ),
-    );
-  }
-
+class VideoFeedScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          StreamBuilder(
-            stream: FirebaseFirestore.instance.collection('videos').snapshots(),
-            builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-              if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
-              final docs = snapshot.data!.docs;
-              return PageView.builder(
-                scrollDirection: Axis.vertical,
-                itemCount: docs.length,
-                itemBuilder: (context, index) {
-                  var data = docs[index].data() as Map<String, dynamic>;
-                  return VideoItem(
-                    videoId: docs[index].id,
-                    videoUrl: data['url'] ?? '',
-                    username: data['usuario'] ?? 'usuario',
-                    caption: data['descripcion'] ?? '',
-                  );
-                },
+      body: StreamBuilder(
+        stream: FirebaseFirestore.instance.collection('videos').snapshots(),
+        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
+          final docs = snapshot.data!.docs;
+          return PageView.builder(
+            scrollDirection: Axis.vertical,
+            itemCount: docs.length,
+            itemBuilder: (context, index) {
+              var data = docs[index].data() as Map<String, dynamic>;
+              return VideoItem(
+                videoId: docs[index].id,
+                videoUrl: data['url'] ?? '',
+                username: data['usuario'] ?? 'usuario',
+                caption: data['descripcion'] ?? '',
               );
             },
-          ),
-          Positioned(
-            top: 40,
-            right: 20,
-            child: FloatingActionButton.extended(
-              backgroundColor: Colors.red,
-              icon: Icon(Icons.monetization_on, color: Colors.white),
-              label: Text("Recargar", style: TextStyle(color: Colors.white)),
-              onPressed: _abrirRecargas,
-            ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
@@ -155,6 +69,10 @@ class _VideoItemState extends State<VideoItem> {
     super.dispose();
   }
 
+  void _darLike() {
+    FirebaseFirestore.instance.collection('videos').doc(widget.videoId).update({'likes': FieldValue.increment(1)});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -175,6 +93,25 @@ class _VideoItemState extends State<VideoItem> {
               Text(widget.caption, style: TextStyle(fontSize: 14, color: Colors.white)),
               SizedBox(height: 20),
             ],
+          ),
+        ),
+        Positioned(
+          right: 15,
+          bottom: 100,
+          child: StreamBuilder<DocumentSnapshot>(
+            stream: FirebaseFirestore.instance.collection('videos').doc(widget.videoId).snapshots(),
+            builder: (context, snapshot) {
+              int likes = 0;
+              if (snapshot.hasData && snapshot.data!.exists) {
+                likes = (snapshot.data!.data() as Map<String, dynamic>)['likes'] ?? 0;
+              }
+              return Column(
+                children: [
+                  IconButton(icon: Icon(Icons.favorite, color: Colors.red, size: 40), onPressed: _darLike),
+                  Text('$likes', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                ],
+              );
+            },
           ),
         ),
       ],
