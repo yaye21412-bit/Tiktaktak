@@ -5,6 +5,8 @@ workflows:
     environment:
       flutter: stable
     scripts:
+      - name: Crear soporte para Android
+        script: flutter create . --platforms=android
       - name: Limpiar proyecto
         script: flutter clean
       - name: Instalar dependencias de Flutter
