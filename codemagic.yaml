@@ -5,12 +5,6 @@ workflows:
     environment:
       flutter: stable
     scripts:
-      - name: Borrar caché y plataforma anterior
-        script: |
-          rm -rf android
-          flutter clean
-      - name: Crear plataforma Android moderna v2
-        script: flutter create . --platforms=android
       - name: Obtener dependencias
         script: flutter pub get
       - name: Construir APK de Android
