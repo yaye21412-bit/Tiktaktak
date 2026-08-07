@@ -216,24 +216,25 @@ class _VideoItemState extends State<VideoItem> {
                   likes = dataDoc['likes'] ?? 0;
                 }
               }
-            return Column(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.favorite, color: Colors.red, size: 40),
-                  onPressed: _darLike,
-                ),
-                Text(
-                  '$likes',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
+              return Column(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.favorite, color: Colors.red, size: 40),
+                    onPressed: _darLike,
                   ),
-                ),
-              ],
-            );
-          },
+                  Text(
+                    '$likes',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
         ),
-      ),
-    ],
-  );
+      ],
+    );
+  }
 }
