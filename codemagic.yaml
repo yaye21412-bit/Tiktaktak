@@ -1,13 +1,17 @@
 workflows:
   default-workflow:
-    name: Compilar Titaktak Final
+    name: Compilación Titaktak Definitiva
     max_build_duration: 30
     environment:
       flutter: stable
     scripts:
+      - name: Limpiar y recrear plataforma Android completa
+        script: |
+          rm -rf android
+          flutter create . --platforms=android
       - name: Obtener dependencias
         script: flutter pub get
-      - name: Construir APK optimizado
+      - name: Construir APK de Android
         script: flutter build apk --release
     artifacts:
       - build/app/outputs/flutter-apk/app-release.apk
